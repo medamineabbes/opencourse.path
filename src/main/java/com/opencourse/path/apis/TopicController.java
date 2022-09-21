@@ -16,7 +16,7 @@ import com.opencourse.path.services.TopicService;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/path/topic")
+@RequestMapping("/api/v1/topic")
 @AllArgsConstructor
 public class TopicController {
     

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import com.opencourse.path.exceptions.CustomAuthenticationException;
 import com.opencourse.path.exceptions.ElementNotFoundException;
 import com.opencourse.path.exceptions.PathActivationException;
 import com.opencourse.path.exceptions.PathNotFoundException;
@@ -21,8 +22,6 @@ import com.opencourse.path.exceptions.ProjectNotFoundException;
 import com.opencourse.path.exceptions.TopicNotFoundException;
 import com.opencourse.path.exceptions.UnAuthorizedActionException;
 import com.opencourse.path.exceptions.UserNotSubscribedException;
-
-import lombok.Data;
 
 @RestControllerAdvice
 public class CustomExceptioHandler {
@@ -46,6 +45,18 @@ public class CustomExceptioHandler {
         error.setStatus(HttpStatus.CONFLICT);
         return new ResponseEntity<ApiError>(error, error.getStatus());
     }
+
+    
+    @ExceptionHandler({CustomAuthenticationException.class})
+    public ResponseEntity<ApiError> handleCustomAuthenticationException(CustomAuthenticationException ex,WebRequest request){
+        ApiError error=new ApiError();
+        error.setMessage(ex.getLocalizedMessage());
+        error.setErrors(new ArrayList<String>());
+        error.getErrors().add(ex.getMessage());
+        error.setStatus(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<ApiError>(error, error.getStatus());
+    }
+
 
     @ExceptionHandler({PathNotFoundException.class})
     public ResponseEntity<ApiError> handlePathNotFoundException(PathNotFoundException ex,WebRequest request){
@@ -124,11 +135,4 @@ public class CustomExceptioHandler {
         return new ResponseEntity<Object>(apiError, apiError.getStatus());
     }
     
-}
-
-@Data
-class ApiError{
-    private HttpStatus status;
-    private String message;
-    private List<String> errors;
 }

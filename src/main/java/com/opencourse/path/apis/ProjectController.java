@@ -3,6 +3,7 @@ package com.opencourse.path.apis;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +20,7 @@ import com.opencourse.path.services.ProjectService;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/path/project")
+@RequestMapping("/api/v1/project")
 @AllArgsConstructor
 public class ProjectController {
 
@@ -28,7 +29,7 @@ public class ProjectController {
     //only teachers
     @PostMapping
     public ResponseEntity<String> addProject(@RequestBody(required = true) ProjectDto dto){
-        Long userId=15L;
+        Long userId=Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         String id=service.addProject(dto, userId);
         return ResponseEntity.ok(id);
     }
@@ -36,7 +37,12 @@ public class ProjectController {
     //all users
     @GetMapping("/{id}")
     public ResponseEntity<ProjectDto> getProjectById(@PathVariable(required = true) String id){
-        Long userId=15L;
+        Long userId;
+        try{
+            userId=Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        }catch(Exception e){
+            userId=null;
+        }
         ProjectDto dto=service.getProjectById(id, userId);
         return ResponseEntity.ok(dto);
     }
@@ -44,7 +50,12 @@ public class ProjectController {
     //all users
     @GetMapping
     public ResponseEntity<List<ProjectDto>> getByPathId(@RequestParam(required = true) String pathId){
-        Long userId=15L;
+        Long userId;
+        try{
+            userId=Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        }catch(Exception e){
+            userId=null;
+        }
         List<ProjectDto> projects=service.getByPathId(pathId, userId);
         return ResponseEntity.ok(projects);
     }
@@ -52,7 +63,7 @@ public class ProjectController {
     //only teachers
     @PutMapping
     public ResponseEntity<Object> updateProject(@RequestBody(required = true) ProjectDto dto){
-        Long userId=15L;
+        Long userId=Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         service.updateProject(dto, userId);;
         return ResponseEntity.ok().build();
     }
@@ -60,7 +71,7 @@ public class ProjectController {
     //only mentor
     @PutMapping("/finish")
     public ResponseEntity<Object> setProjectAsFinished(@RequestBody(required = true) FinishProjectDto dto){
-        Long userId=15L;
+        Long userId=Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         service.setProjectAsFinsihed(dto, userId);
         return ResponseEntity.ok().build();
     }
